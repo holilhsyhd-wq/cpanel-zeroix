@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs Aktivitas Create Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📜 Log Aktivitas</h1>
+    <input type="password" id="key" placeholder="Masukkan Password Admin">
+    <button id="lihatBtn">🔍 Lihat Log</button>
+    <div id="logs"></div>
+  </div>
+
+  <script>
+    document.getElementById("lihatBtn").addEventListener("click", async () => {
+      const key = document.getElementById("key").value.trim();
+      const logsContainer = document.getElementById("logs");
+      logsContainer.innerHTML = "<p>⏳ Memuat log...</p>";
+
+      const res = await fetch(`/api/logs?key=${encodeURIComponent(key)}`);
+      const data = await res.json();
+
+      if (!data.success) {
+        logsContainer.innerHTML = `<p class='error'>${data.error}</p>`;
+        return;
+      }
+
+      if (data.logs.length === 0) {
+        logsContainer.innerHTML = "<p>Belum ada aktivitas.</p>";
+        return;
+      }
+
+      logsContainer.innerHTML = data.logs.map(log => `
+        <div class="log">
+          <p><b>🕓</b> ${log.time}</p>
+          <p><b>Mode:</b> ${log.mode}</p>
+          <p><b>Server:</b> ${log.server}</p>
+          <p><b>RAM:</b> ${log.memory} MB</p>
+          <p><b>Panel:</b> ${log.panel}</p>
+          <p><b>IP:</b> ${log.ip}</p>
+        </div>
+      `).join("");
+    });
+  </script>
+</body>
+</html>
