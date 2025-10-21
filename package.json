@@ -1,0 +1,13 @@
+{
+  "name": "ptero-panel-create",
+  "version": "1.0.0",
+  "description": "Website Create Panel Pterodactyl (Private & Public)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
