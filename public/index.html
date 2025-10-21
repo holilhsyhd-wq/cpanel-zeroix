@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Panel Pterodactyl | ZeroIX Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ Create Panel Pterodactyl</h1>
+    <p>Silakan isi data di bawah untuk membuat akun & server panel.</p>
+
+    <form id="createForm">
+      <label for="mode">Pilih Mode Panel:</label>
+      <select id="mode" name="mode" required>
+        <option value="">-- Pilih Mode --</option>
+        <option value="public">🌐 Public Server</option>
+        <option value="private">🔒 Private Server</option>
+      </select>
+
+      <label for="password">Masukkan Secret Key:</label>
+      <input type="password" id="password" name="password" placeholder="Masukkan password mode" required />
+
+      <label for="serverName">Nama Server:</label>
+      <input type="text" id="serverName" name="serverName" placeholder="Contoh: Bot WhatsApp" required />
+
+      <label for="ram">Pilih RAM:</label>
+      <select id="ram" name="ram" required>
+        <option value="1024">1 GB</option>
+        <option value="2048">2 GB</option>
+        <option value="3072">3 GB</option>
+        <option value="4096">4 GB</option>
+        <option value="5120">5 GB</option>
+        <option value="6144">6 GB</option>
+        <option value="8192">8 GB</option>
+        <option value="9216">9 GB</option>
+        <option value="0">Unlimited</option>
+      </select>
+
+      <button type="submit">🚀 Create Panel</button>
+    </form>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("createForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      resultDiv.innerHTML = "⏳ Membuat panel, mohon tunggu...";
+      const formData = {
+        mode: form.mode.value,
+        password: form.password.value,
+        serverName: form.serverName.value,
+        ram: form.ram.value,
+      };
+
+      try {
+        const res = await fetch("/api/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <div class="success">
+              ✅ <b>Panel Berhasil Dibuat!</b><br><br>
+              🌐 <b>URL Panel:</b> <a href="${data.panel}" target="_blank">${data.panel}</a><br>
+              👤 <b>Username:</b> ${data.username}<br>
+              📧 <b>Email:</b> ${data.email}<br>
+              🔑 <b>Password:</b> ${data.password}<br>
+              🖥️ <b>Server:</b> ${data.server}<br>
+              💾 <b>RAM:</b> ${data.ram} MB
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<div class="error">🚫 Terjadi kesalahan koneksi ke server API.</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
