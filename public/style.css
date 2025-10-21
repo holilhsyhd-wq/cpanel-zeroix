@@ -1,0 +1,52 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0e0e10;
+  color: white;
+  text-align: center;
+  padding: 40px;
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  background: #1c1c22;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+input, select {
+  background: #2a2a33;
+  color: white;
+}
+
+button {
+  background: #5865f2;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4752c4;
+}
+
+.error {
+  color: #ff5555;
+}
+
+.log {
+  text-align: left;
+  background: #252532;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px 0;
+}
