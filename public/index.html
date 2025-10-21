@@ -3,90 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Panel Pterodactyl | ZeroIX Panel</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Create Panel Pterodactyl</title>
+  <style>
+    body {
+      background-color: #0e0e12;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #1a1a22;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #000;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    select, input {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #4f46e5;
+      border: none;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+    .error {
+      color: #ff4444;
+      margin-top: 0.8rem;
+    }
+    .success {
+      color: #00ff88;
+      margin-top: 0.8rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>⚙️ Create Panel Pterodactyl</h1>
     <p>Silakan isi data di bawah untuk membuat akun & server panel.</p>
-
-    <form id="createForm">
-      <label for="mode">Pilih Mode Panel:</label>
-      <select id="mode" name="mode" required>
-        <option value="">-- Pilih Mode --</option>
-        <option value="public">🌐 Public Server</option>
-        <option value="private">🔒 Private Server</option>
-      </select>
-
-      <label for="password">Masukkan Secret Key:</label>
-      <input type="password" id="password" name="password" placeholder="Masukkan password mode" required />
-
-      <label for="serverName">Nama Server:</label>
-      <input type="text" id="serverName" name="serverName" placeholder="Contoh: Bot WhatsApp" required />
-
-      <label for="ram">Pilih RAM:</label>
-      <select id="ram" name="ram" required>
-        <option value="1024">1 GB</option>
-        <option value="2048">2 GB</option>
-        <option value="3072">3 GB</option>
-        <option value="4096">4 GB</option>
-        <option value="5120">5 GB</option>
-        <option value="6144">6 GB</option>
-        <option value="8192">8 GB</option>
-        <option value="9216">9 GB</option>
-        <option value="0">Unlimited</option>
-      </select>
-
-      <button type="submit">🚀 Create Panel</button>
-    </form>
-
-    <div id="result" class="result"></div>
+    <select id="mode">
+      <option value="public">🌐 Public Server</option>
+      <option value="private">🔒 Private Server</option>
+    </select>
+    <input type="password" id="secret" placeholder="Masukkan Secret Key" />
+    <input type="text" id="server_name" placeholder="Nama Server" />
+    <select id="ram">
+      <option value="">Pilih RAM</option>
+      <option value="1024">1 GB</option>
+      <option value="2048">2 GB</option>
+      <option value="4096">4 GB</option>
+      <option value="8192">8 GB</option>
+      <option value="10240">10 GB (Unlimited)</option>
+    </select>
+    <button onclick="createPanel()">🚀 Create Panel</button>
+    <div id="msg"></div>
   </div>
 
   <script>
-    const form = document.getElementById("createForm");
-    const resultDiv = document.getElementById("result");
+    async function createPanel() {
+      const mode = document.getElementById('mode').value;
+      const secret = document.getElementById('secret').value.trim();
+      const server_name = document.getElementById('server_name').value.trim();
+      const ram = document.getElementById('ram').value;
+      const msg = document.getElementById('msg');
+      msg.textContent = '';
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+      if (!secret || !server_name || !ram) {
+        msg.innerHTML = "❌ Data tidak lengkap.";
+        msg.className = "error";
+        return;
+      }
 
-      resultDiv.innerHTML = "⏳ Membuat panel, mohon tunggu...";
-      const formData = {
-        mode: form.mode.value,
-        password: form.password.value,
-        serverName: form.serverName.value,
-        ram: form.ram.value,
-      };
+      // Validasi secret key
+      const PUBLIC_KEY = "barmods_public";
+      const PRIVATE_KEY = "barmods_privat";
+
+      if (mode === "public" && secret !== PUBLIC_KEY) {
+        msg.innerHTML = "❌ Secret Key Public salah!";
+        msg.className = "error";
+        return;
+      }
+      if (mode === "private" && secret !== PRIVATE_KEY) {
+        msg.innerHTML = "❌ Secret Key Private salah!";
+        msg.className = "error";
+        return;
+      }
+
+      msg.innerHTML = "⏳ Sedang membuat panel...";
+      msg.className = "";
 
       try {
         const res = await fetch("/api/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ mode, server_name, ram })
         });
 
         const data = await res.json();
 
-        if (data.success) {
-          resultDiv.innerHTML = `
-            <div class="success">
-              ✅ <b>Panel Berhasil Dibuat!</b><br><br>
-              🌐 <b>URL Panel:</b> <a href="${data.panel}" target="_blank">${data.panel}</a><br>
-              👤 <b>Username:</b> ${data.username}<br>
-              📧 <b>Email:</b> ${data.email}<br>
-              🔑 <b>Password:</b> ${data.password}<br>
-              🖥️ <b>Server:</b> ${data.server}<br>
-              💾 <b>RAM:</b> ${data.ram} MB
-            </div>
-          `;
-        } else {
-          resultDiv.innerHTML = `<div class="error">❌ ${data.error}</div>`;
-        }
-      } catch (err) {
-        resultDiv.innerHTML = `<div class="error">🚫 Terjadi kesalahan koneksi ke server API.</div>`;
+        if (!res.ok) throw new Error(data.message || "Gagal membuat panel");
+
+        msg.innerHTML = "✅ Panel berhasil dibuat!";
+        msg.className = "success";
+      } catch (e) {
+        msg.innerHTML = "❌ " + e.message;
+        msg.className = "error";
       }
-    });
+    }
   </script>
 </body>
 </html>
